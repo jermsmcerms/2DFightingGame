@@ -58,3 +58,11 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+*.vsconfig
+2DFightingGame/Assets/Models/
+2DFightingGame/Library/
+2DFightingGame/Logs/
+2DFightingGame/obj/
+2DFightingGame/Packages/
+2DFightingGame/ProjectSettings/
+2DFightingGame/UserSettings/
