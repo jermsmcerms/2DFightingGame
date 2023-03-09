@@ -22,14 +22,15 @@ namespace TDFG {
         public bool IsKnockedOut() => m_health < 0;
 
         public void UpdateHealth() {
-            int randomUpdate = Random.Range(0, 2);
-            if(randomUpdate == 1) {
-                int randomDamage = Random.Range(0, 2);
-                Health -= randomDamage;
-                if(UpdateHealthEvent != null) {
-                    UpdateHealthEvent(PlayerNumber, Health);
-                }
-            }
+            // Save this call for later when I implement
+            // taking damgae from other players
+            /*if(UpdateHealthEvent != null) {
+                UpdateHealthEvent(PlayerNumber, Health);
+            }*/
+        }
+
+        private void Awake() {
+            Health = MaxHealth;
         }
     }
 }

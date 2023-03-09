@@ -7,16 +7,24 @@ namespace TDFG {
     [RequireComponent(typeof(MatchEvent))]
     public class MatchManager : MonoBehaviour
     {
+        /**
+         * static events
+         */
         public static event Action<Fighter> InitializeUI;
         public static event Action<List<Fighter>> TimeOverEvent;
         public static event Action<List<Fighter>> KnockoutEvent;
         public static event Action ResetUI;
 
+        /**
+         * public static fields
+         */
         public static readonly int ROUNDS_TO_WIN = 2;
 
-        public List<Fighter> Fighters { get { return m_fighters; } }
+        /**
+         * editor fields
+         */
         [SerializeField]
-        private List<Fighter> m_fighters;
+        private List<PlayerController> m_players;
 
         [SerializeField]
         private TMP_Text m_matchTimeText;
@@ -27,18 +35,29 @@ namespace TDFG {
         [SerializeField]
         private float m_roundEndTimeLength;
 
+        /**
+         * private fields
+         */
+        private List<Fighter> m_fighters;
         private float m_matchTimer;
         private float m_roundEndTimer;
         private MatchState m_currentState;
 
-        // Start is called before the first frame update
+        /**
+         * public interface
+         */
+
+        /**
+         * unity api functions
+         */
         void Awake() {
-            for (int i = 0; i < m_fighters.Count; i++) {
-                m_fighters[i].MaxHealth = m_fighters[i].Health;
-                m_fighters[i].PlayerNumber = i;
+            m_fighters = new();
+            for (int i = 0; i < m_players.Count; i++) {
+                m_players[i].Fighter.PlayerNumber = i;
                 if(InitializeUI != null) {
-                    InitializeUI(m_fighters[i]);
+                    InitializeUI(m_players[i].Fighter);
                 }
+                m_fighters.Add(m_players[i].Fighter);
             }
 
             m_currentState = MatchState.FIGHT;
@@ -62,6 +81,9 @@ namespace TDFG {
             }
         }
 
+        /**
+         * private functions
+         */
         private void CheckForGameOver() {
             if(m_matchTimeLength < 0.0 && TimeOverEvent != null) {
                 TimeOverEvent(m_fighters);
@@ -97,7 +119,7 @@ namespace TDFG {
                 }
             }
         }
-    }
+    } // end of MatchManager class
 
     public enum MatchState {
         START,
