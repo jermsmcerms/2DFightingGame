@@ -24,13 +24,18 @@ namespace TDFG {
         public void UpdateHealth() {
             // Save this call for later when I implement
             // taking damgae from other players
-            /*if(UpdateHealthEvent != null) {
-                UpdateHealthEvent(PlayerNumber, Health);
-            }*/
+            int value1 = Random.Range(0, 2);
+            if(value1 == 0) {
+                int value2 = Random.Range(0, 2);
+                m_health -= value2;
+                if (UpdateHealthEvent != null) {
+                    UpdateHealthEvent(PlayerNumber, Health);
+                }
+            }
         }
 
         private void Awake() {
-            Health = MaxHealth;
+            MaxHealth = Health;
         }
     }
 }

@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 namespace TDFG {
     [RequireComponent(typeof(MatchEvent))]
+    [RequireComponent(typeof(AudioSource))]
     public class MatchManager : MonoBehaviour
     {
         /**
@@ -27,6 +29,9 @@ namespace TDFG {
         private List<PlayerController> m_players;
 
         [SerializeField]
+        private AudioClip KOClip;
+
+        [SerializeField]
         private TMP_Text m_matchTimeText;
 
         [SerializeField]
@@ -42,7 +47,8 @@ namespace TDFG {
         private float m_matchTimer;
         private float m_roundEndTimer;
         private MatchState m_currentState;
-
+        private AudioSource m_audioSource;
+        private bool m_koSoundPlaying;
         /**
          * public interface
          */
@@ -52,17 +58,23 @@ namespace TDFG {
          */
         void Awake() {
             m_fighters = new();
+            
+            m_roundEndTimer = m_roundEndTimeLength;
+            m_matchTimer = m_matchTimeLength;
+            m_audioSource = GetComponent<AudioSource>();
+            m_koSoundPlaying = false;
+        }
+
+        private void Start() {
             for (int i = 0; i < m_players.Count; i++) {
                 m_players[i].Fighter.PlayerNumber = i;
-                if(InitializeUI != null) {
+                if (InitializeUI != null) {
                     InitializeUI(m_players[i].Fighter);
                 }
                 m_fighters.Add(m_players[i].Fighter);
             }
 
             m_currentState = MatchState.FIGHT;
-            m_roundEndTimer = m_roundEndTimeLength;
-            m_matchTimer = m_matchTimeLength;
         }
 
         // Update is called once per frame
@@ -75,7 +87,9 @@ namespace TDFG {
                     break;
                 }
                 case MatchState.END: {
-                    UpdateRoundEndTimer();
+                    if(!m_koSoundPlaying) {
+                        StartCoroutine(PlayKOClip());
+                    }
                     break;
                 }
             }
@@ -85,25 +99,41 @@ namespace TDFG {
          * private functions
          */
         private void CheckForGameOver() {
-            if(m_matchTimeLength < 0.0 && TimeOverEvent != null) {
+            if(m_matchTimer < 0.0 && TimeOverEvent != null) {
                 TimeOverEvent(m_fighters);
                 m_currentState = MatchState.END;
             }
             else {
                 m_fighters.ForEach(f => {
-                    if (f.IsKnockedOut() && KnockoutEvent != null) {
-                        KnockoutEvent(m_fighters);
+                    if (f.IsKnockedOut()) {
                         m_currentState = MatchState.END;
                     }
                 });
             }
         }
 
+        private IEnumerator PlayKOClip() {
+            m_audioSource.clip = KOClip;
+            m_audioSource.Play();
+            m_koSoundPlaying = true;
+
+            yield return new WaitUntil(() => m_audioSource.isPlaying == false);
+
+            if (KnockoutEvent != null) {
+                KnockoutEvent(m_fighters);
+                // If we get here it means there is another round to play...
+                m_matchTimer = m_matchTimeLength;
+                m_fighters.ForEach(f => f.Health = f.MaxHealth);
+                m_currentState = MatchState.FIGHT;
+                if (ResetUI != null) {
+                    ResetUI();
+                }
+                m_koSoundPlaying = false;
+            }
+        }
+
         private void UpdateMatchTimer() {
             m_matchTimer -= Time.deltaTime;
-            if (m_matchTimer < 0.0f) {
-                m_currentState = MatchState.END;   
-            }
             m_matchTimeText.text = m_matchTimer.ToString("F0");
         }
 
