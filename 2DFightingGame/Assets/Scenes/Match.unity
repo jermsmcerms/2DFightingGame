@@ -990,6 +990,66 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 945631012}
   m_CullTransparentMesh: 1
+--- !u!1 &1071535841
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1071535844}
+  - component: {fileID: 1071535843}
+  - component: {fileID: 1071535842}
+  m_Layer: 0
+  m_Name: Player2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1071535842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071535841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a36e6f8ee9a28ca41bbf9ad2e369809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_fighter: {fileID: 1071535843}
+  m_bufferWindow: 0
+--- !u!114 &1071535843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071535841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cece20e27f65dbc49b71c0a6a0562d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_health: 300
+--- !u!4 &1071535844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071535841}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 498.06805, y: 268.75668, z: 7.1089644}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1134342499
 GameObject:
   m_ObjectHideFlags: 0
@@ -999,8 +1059,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1134342500}
-  - component: {fileID: 1134342501}
   - component: {fileID: 1134342502}
+  - component: {fileID: 1134342501}
   - component: {fileID: 1134342503}
   m_Layer: 0
   m_Name: MatchManager
@@ -1038,7 +1098,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_players:
   - {fileID: 1400746343}
-  KOClip: {fileID: 0}
+  - {fileID: 1071535842}
+  KOClip: {fileID: 8300000, guid: 188ebc1462562a647838207520bf9873, type: 3}
   m_matchTimeText: {fileID: 332560147}
   m_matchTimeLength: 5
   m_roundEndTimeLength: 3
@@ -1066,7 +1127,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1581,7 +1642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cece20e27f65dbc49b71c0a6a0562d4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_health: 1000
+  m_health: 300
 --- !u!4 &1400746345
 Transform:
   m_ObjectHideFlags: 0

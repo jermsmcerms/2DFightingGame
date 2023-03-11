@@ -60,6 +60,7 @@ crashlytics-build.properties
 
 *.vsconfig
 2DFightingGame/Assets/3rd Party/
+2DFightingGame/Assets/Audio/
 2DFightingGame/Library/
 2DFightingGame/Logs/
 2DFightingGame/obj/
