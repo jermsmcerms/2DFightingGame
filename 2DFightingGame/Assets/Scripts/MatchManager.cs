@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,23 +11,14 @@ namespace TDFG {
     [RequireComponent(typeof(AudioSource))]
     public class MatchManager : MonoBehaviour
     {
-        /**
-         * static events
-         */
         public static event Action<Fighter> InitializeUI;
         public static event Action<List<Fighter>, int> TimeOverEvent;
         public static event Action<List<Fighter>, int> KnockoutEvent;
         public static event Action ResetUI;
         public static event Action<float> UpdateMatchTimer;
 
-        /**
-         * public static fields
-         */
         public static readonly int ROUNDS_TO_WIN = 2;
         public static readonly int MAX_ROUNDS = 3;
-        /**
-         * editor fields
-         */
 
         [SerializeField]
         private List<PlayerController> m_players;
@@ -42,9 +32,6 @@ namespace TDFG {
         [SerializeField]
         private AnnouncerData m_announcerData;
         
-        /**
-         * private fields
-         */
         private float m_matchTimer;
         private MatchState m_currentState;
         private bool m_matchEndStarted;
@@ -56,13 +43,6 @@ namespace TDFG {
         private List<Fighter> m_fighters;
         private AudioManager m_audioManager;
 
-        /**
-         * public interface
-         */
-
-        /**
-         * unity api functions
-         */
         void Awake() {
             m_fighters = new();
             
@@ -85,7 +65,6 @@ namespace TDFG {
             m_currentState = MatchState.START;
         }
 
-        // Update is called once per frame
         void Update() {
             switch (m_currentState) {
                 case MatchState.START: {
@@ -112,9 +91,6 @@ namespace TDFG {
             }
         }
 
-        /**
-         * private functions
-         */
         private void CheckForGameOver() {
             if(m_matchTimer < 0.0 && TimeOverEvent != null) {
                 m_currentState = MatchState.END;
