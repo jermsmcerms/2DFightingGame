@@ -12,6 +12,7 @@ namespace TDFG {
             MatchManager.InitializeUI += InitializeUI;
             MatchManager.TimeOverEvent += HandleTimeOverEvent;
             MatchManager.ResetUI += ResetUI;
+            MatchManager.UpdateMatchTimer += UpdateMatchTimer;
             Fighter.UpdateHealthEvent += UpdateHealth;
 
         }
@@ -21,19 +22,25 @@ namespace TDFG {
             MatchManager.InitializeUI -= InitializeUI;
             MatchManager.TimeOverEvent -= HandleTimeOverEvent;
             MatchManager.ResetUI -= ResetUI;
+            MatchManager.UpdateMatchTimer -= UpdateMatchTimer;
+
             Fighter.UpdateHealthEvent -= UpdateHealth;
 
         }
 
-        private void CheckForRoundsWon(List<Fighter> fighters) {
+        private void CheckForRoundsWon(List<Fighter> fighters, int currentRound) {
             fighters.ForEach(f => {
                 if (f.RoundsWon == MatchManager.ROUNDS_TO_WIN) {
                     SceneManager.LoadScene((int)SceneIndex.REMATCH);
                 }
             });
+
+            if(currentRound == MatchManager.MAX_ROUNDS) {
+                SceneManager.LoadScene((int)SceneIndex.REMATCH);
+            }
         }
 
-        private void HandleKnockoutEvent(List<Fighter> fighters) {
+        private void HandleKnockoutEvent(List<Fighter> fighters, int currentRound) {
             if (fighters[0].IsKnockedOut()) {
                 fighters[1].RoundsWon++;
                 m_matchUI.UpdateRoundsWon(fighters[1].PlayerNumber, fighters[1].RoundsWon);
@@ -43,12 +50,12 @@ namespace TDFG {
                 m_matchUI.UpdateRoundsWon(fighters[0].PlayerNumber, fighters[0].RoundsWon);
             }
 
-            CheckForRoundsWon(fighters);
+            CheckForRoundsWon(fighters, currentRound);
 
             m_matchUI.SetRoundStateText("KO");
         }
 
-        private void HandleTimeOverEvent(List<Fighter> fighters) {
+        private void HandleTimeOverEvent(List<Fighter> fighters, int currentRound) {
             if (fighters[0].Health > fighters[1].Health) {
                 fighters[0].RoundsWon++;
                 m_matchUI.UpdateRoundsWon(fighters[0].PlayerNumber, fighters[0].RoundsWon);
@@ -57,7 +64,7 @@ namespace TDFG {
                 fighters[1].RoundsWon++;
                 m_matchUI.UpdateRoundsWon(fighters[1].PlayerNumber, fighters[1].RoundsWon);
             }
-            CheckForRoundsWon(fighters);
+            CheckForRoundsWon(fighters, currentRound);
 
             m_matchUI.SetRoundStateText("Time Over");
         }
@@ -72,6 +79,10 @@ namespace TDFG {
 
         private void UpdateHealth(int playerNumber, int health) {
             m_matchUI.UpdateHealth(playerNumber, health);
+        }
+
+        private void UpdateMatchTimer(float time) {
+            m_matchUI.UpdateMatchTimer(time);
         }
     }
 

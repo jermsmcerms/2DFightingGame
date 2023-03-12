@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TDFG {
+    [RequireComponent(typeof(AudioManager))]
     [RequireComponent(typeof(MatchEvent))]
     [RequireComponent(typeof(AudioSource))]
     public class MatchManager : MonoBehaviour
@@ -14,23 +16,22 @@ namespace TDFG {
          * static events
          */
         public static event Action<Fighter> InitializeUI;
-        public static event Action<List<Fighter>> TimeOverEvent;
-        public static event Action<List<Fighter>> KnockoutEvent;
+        public static event Action<List<Fighter>, int> TimeOverEvent;
+        public static event Action<List<Fighter>, int> KnockoutEvent;
         public static event Action ResetUI;
+        public static event Action<float> UpdateMatchTimer;
 
         /**
          * public static fields
          */
         public static readonly int ROUNDS_TO_WIN = 2;
-
+        public static readonly int MAX_ROUNDS = 3;
         /**
          * editor fields
          */
-        [SerializeField]
-        private List<PlayerController> m_players;
 
         [SerializeField]
-        private List<AudioClip> m_narratorClips;
+        private List<PlayerController> m_players;
 
         [SerializeField]
         private TMP_Text m_matchTimeText;
@@ -39,18 +40,21 @@ namespace TDFG {
         private float m_matchTimeLength;
 
         [SerializeField]
-        private float m_roundEndTimeLength;
-
+        private AnnouncerData m_announcerData;
+        
         /**
          * private fields
          */
-        private List<Fighter> m_fighters;
         private float m_matchTimer;
-        private float m_roundEndTimer;
         private MatchState m_currentState;
-        private AudioSource m_audioSource;
         private bool m_matchEndStarted;
+        private bool m_matchIntroStarted;
         private bool m_timeOverFlag;
+        private int m_currentRound;
+
+        // Private components
+        private List<Fighter> m_fighters;
+        private AudioManager m_audioManager;
 
         /**
          * public interface
@@ -62,10 +66,11 @@ namespace TDFG {
         void Awake() {
             m_fighters = new();
             
-            m_roundEndTimer = m_roundEndTimeLength;
             m_matchTimer = m_matchTimeLength;
-            m_audioSource = GetComponent<AudioSource>();
+            m_audioManager = GetComponent<AudioManager>();
             m_matchEndStarted = false;
+            m_currentRound = 1;
+            m_announcerData.InitializeData();
         }
 
         private void Start() {
@@ -77,15 +82,24 @@ namespace TDFG {
                 m_fighters.Add(m_players[i].Fighter);
             }
 
-            m_currentState = MatchState.FIGHT;
+            m_currentState = MatchState.START;
         }
 
         // Update is called once per frame
         void Update() {
             switch (m_currentState) {
+                case MatchState.START: {
+                    if (!m_matchIntroStarted) {
+                        StartCoroutine(RunMatchStartEvents());
+                    }
+                    break;
+                }
                 case MatchState.FIGHT: {
                     m_fighters.ForEach(fighter => fighter.UpdateHealth());
-                    UpdateMatchTimer();
+                    m_matchTimer -= Time.deltaTime;
+                    if(UpdateMatchTimer != null) {
+                        UpdateMatchTimer(m_matchTimer);
+                    }
                     CheckForGameOver();
                     break;
                 }
@@ -117,85 +131,57 @@ namespace TDFG {
 
         private IEnumerator RunMatchEndEvents() {
             m_matchEndStarted = true;
-
-            List<AudioClip> m_matchEndClips = new();
-            if(m_timeOverFlag) {
-                m_matchEndClips.Add(m_narratorClips[4]); // time over
-                if (m_fighters[0].RoundsWon == ROUNDS_TO_WIN &&
-                    m_fighters[1].RoundsWon == ROUNDS_TO_WIN) {
-                    m_matchEndClips.Add(m_narratorClips[1]); // draw game
-                }
-            }
-            else {
-                if (m_fighters[0].Health == 0 && m_fighters[1].Health == 0) {
-                    m_matchEndClips.Add(m_narratorClips[0]); // double ko
-                    if (m_fighters[0].RoundsWon == ROUNDS_TO_WIN &&
-                        m_fighters[1].RoundsWon == ROUNDS_TO_WIN) {
-                        m_matchEndClips.Add(m_narratorClips[1]); // draw game
-                    }
-                }
-                else if (m_fighters[0].Health == m_fighters[0].MaxHealth ||
-                    m_fighters[1].Health == m_fighters[1].MaxHealth) {
-                    m_matchEndClips.Add(m_narratorClips[2]); // ko
-                    m_matchEndClips.Add(m_narratorClips[3]); // perfect
-                }
-                else {
-                    m_matchEndClips.Add(m_narratorClips[2]); // ko
-                    m_matchEndClips.Add(m_narratorClips[5]); // you win
-                }
-            }
+            List<AudioClip> m_matchEndClips = m_audioManager.BuildMatchEndClips(m_announcerData.MatchEndAudio, m_fighters, m_timeOverFlag, m_currentRound);
 
             for (int i = 0; i < m_matchEndClips.Count; i++) {
-                yield return StartCoroutine(PlayClip(m_matchEndClips[i]));
+                yield return StartCoroutine(m_audioManager.PlayAsync(m_matchEndClips[i]));
             }
 
-            if(m_timeOverFlag && TimeOverEvent != null) {
-                TimeOverEvent(m_fighters);
-                m_matchTimer = m_matchTimeLength;
-                m_fighters.ForEach(f => f.Health = f.MaxHealth);
-                m_currentState = MatchState.FIGHT;
-                if (ResetUI != null) {
-                    ResetUI();
-                }
-                m_matchEndStarted = false;
-                m_timeOverFlag = false;
+            HandleMatchEndEvents();
+            ResetMatch();
+        }
+
+        private void ResetMatch() {
+            m_currentRound++;
+            m_matchTimer = m_matchTimeLength;
+            m_fighters.ForEach(f => f.Health = f.MaxHealth);
+            m_currentState = MatchState.START;
+            if (ResetUI != null) {
+                ResetUI();
             }
+            m_matchEndStarted = false;
+            m_matchIntroStarted = false;
+            m_timeOverFlag = false;
+        }
+
+        private void HandleMatchEndEvents() {
+            if (m_timeOverFlag && TimeOverEvent != null) {
+                TimeOverEvent(m_fighters, m_currentRound);
+            }
+
             else if (KnockoutEvent != null) {
-                KnockoutEvent(m_fighters);
-                // If we get here it means there is another round to play...
-                m_matchTimer = m_matchTimeLength;
-                m_fighters.ForEach(f => f.Health = f.MaxHealth);
-                m_currentState = MatchState.FIGHT;
-                if (ResetUI != null) {
-                    ResetUI();
-                }
-                m_matchEndStarted = false;
-                m_timeOverFlag = false;
+                KnockoutEvent(m_fighters, m_currentRound);
             }
         }
 
-        private IEnumerator PlayClip(AudioClip clip) {
-            m_audioSource.clip = clip;
-            m_audioSource.Play();
-            yield return new WaitUntil(() => m_audioSource.isPlaying == false);
-        }
+        private IEnumerator RunMatchStartEvents() {
+            m_matchIntroStarted = true;
+            if (m_currentRound == MAX_ROUNDS) {
+                yield return m_audioManager.PlayAsync(m_announcerData.MatchEndAudio["FINAL_ROUND"]);
+            }
+            else {
+                List<AudioClip> introClips = new();
+                int randomIndex = Random.Range(0, m_announcerData.matchIntroAudioClipSetA.Count);
+                introClips.Add(m_announcerData.matchIntroAudioClipSetA[randomIndex]);
+                
+                randomIndex = Random.Range(0, m_announcerData.matchIntroAudioClipSetB.Count);
+                introClips.Add(m_announcerData.matchIntroAudioClipSetB[randomIndex]);
 
-        private void UpdateMatchTimer() {
-            m_matchTimer -= Time.deltaTime;
-            m_matchTimeText.text = m_matchTimer.ToString("F0");
-        }
-
-        private void UpdateRoundEndTimer() {
-            m_roundEndTimer -= Time.deltaTime;
-            if(m_roundEndTimer < 0.0) {
-                m_roundEndTimer = m_roundEndTimeLength;
-                m_matchTimer = m_matchTimeLength;
-                m_fighters.ForEach(f => f.Health = f.MaxHealth);
-                m_currentState = MatchState.FIGHT;
-                if(ResetUI != null) {
-                    ResetUI();
+                foreach (AudioClip clip in introClips) {
+                    yield return m_audioManager.PlayAsync(clip);
                 }
             }
+            m_currentState = MatchState.FIGHT;
         }
     } // end of MatchManager class
 
