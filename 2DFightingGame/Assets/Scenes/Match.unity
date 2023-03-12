@@ -1099,7 +1099,13 @@ MonoBehaviour:
   m_players:
   - {fileID: 1400746343}
   - {fileID: 1071535842}
-  KOClip: {fileID: 8300000, guid: 188ebc1462562a647838207520bf9873, type: 3}
+  m_narratorClips:
+  - {fileID: 8300000, guid: 45ff1a3f6336ea049a440d1377e6befe, type: 3}
+  - {fileID: 8300000, guid: 603f86f5c3ddf2849aa877e99631359e, type: 3}
+  - {fileID: 8300000, guid: 188ebc1462562a647838207520bf9873, type: 3}
+  - {fileID: 8300000, guid: dd8eabb27d0b78242adaae1c5dffdee1, type: 3}
+  - {fileID: 8300000, guid: 09ec17d1dcaa5a5468e6730bb0507cef, type: 3}
+  - {fileID: 8300000, guid: 6c807884b9817904c9ec4b6737aad911, type: 3}
   m_matchTimeText: {fileID: 332560147}
   m_matchTimeLength: 5
   m_roundEndTimeLength: 3

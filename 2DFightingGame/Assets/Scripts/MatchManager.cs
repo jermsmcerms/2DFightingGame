@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ namespace TDFG {
         private List<PlayerController> m_players;
 
         [SerializeField]
-        private AudioClip KOClip;
+        private List<AudioClip> m_narratorClips;
 
         [SerializeField]
         private TMP_Text m_matchTimeText;
@@ -48,7 +49,9 @@ namespace TDFG {
         private float m_roundEndTimer;
         private MatchState m_currentState;
         private AudioSource m_audioSource;
-        private bool m_koSoundPlaying;
+        private bool m_matchEndStarted;
+        private bool m_timeOverFlag;
+
         /**
          * public interface
          */
@@ -62,7 +65,7 @@ namespace TDFG {
             m_roundEndTimer = m_roundEndTimeLength;
             m_matchTimer = m_matchTimeLength;
             m_audioSource = GetComponent<AudioSource>();
-            m_koSoundPlaying = false;
+            m_matchEndStarted = false;
         }
 
         private void Start() {
@@ -87,8 +90,8 @@ namespace TDFG {
                     break;
                 }
                 case MatchState.END: {
-                    if(!m_koSoundPlaying) {
-                        StartCoroutine(PlayKOClip());
+                    if(!m_matchEndStarted) {
+                        StartCoroutine(RunMatchEndEvents());
                     }
                     break;
                 }
@@ -100,8 +103,8 @@ namespace TDFG {
          */
         private void CheckForGameOver() {
             if(m_matchTimer < 0.0 && TimeOverEvent != null) {
-                TimeOverEvent(m_fighters);
                 m_currentState = MatchState.END;
+                m_timeOverFlag = true;
             }
             else {
                 m_fighters.ForEach(f => {
@@ -112,14 +115,52 @@ namespace TDFG {
             }
         }
 
-        private IEnumerator PlayKOClip() {
-            m_audioSource.clip = KOClip;
-            m_audioSource.Play();
-            m_koSoundPlaying = true;
+        private IEnumerator RunMatchEndEvents() {
+            m_matchEndStarted = true;
 
-            yield return new WaitUntil(() => m_audioSource.isPlaying == false);
+            List<AudioClip> m_matchEndClips = new();
+            if(m_timeOverFlag) {
+                m_matchEndClips.Add(m_narratorClips[4]); // time over
+                if (m_fighters[0].RoundsWon == ROUNDS_TO_WIN &&
+                    m_fighters[1].RoundsWon == ROUNDS_TO_WIN) {
+                    m_matchEndClips.Add(m_narratorClips[1]); // draw game
+                }
+            }
+            else {
+                if (m_fighters[0].Health == 0 && m_fighters[1].Health == 0) {
+                    m_matchEndClips.Add(m_narratorClips[0]); // double ko
+                    if (m_fighters[0].RoundsWon == ROUNDS_TO_WIN &&
+                        m_fighters[1].RoundsWon == ROUNDS_TO_WIN) {
+                        m_matchEndClips.Add(m_narratorClips[1]); // draw game
+                    }
+                }
+                else if (m_fighters[0].Health == m_fighters[0].MaxHealth ||
+                    m_fighters[1].Health == m_fighters[1].MaxHealth) {
+                    m_matchEndClips.Add(m_narratorClips[2]); // ko
+                    m_matchEndClips.Add(m_narratorClips[3]); // perfect
+                }
+                else {
+                    m_matchEndClips.Add(m_narratorClips[2]); // ko
+                    m_matchEndClips.Add(m_narratorClips[5]); // you win
+                }
+            }
 
-            if (KnockoutEvent != null) {
+            for (int i = 0; i < m_matchEndClips.Count; i++) {
+                yield return StartCoroutine(PlayClip(m_matchEndClips[i]));
+            }
+
+            if(m_timeOverFlag && TimeOverEvent != null) {
+                TimeOverEvent(m_fighters);
+                m_matchTimer = m_matchTimeLength;
+                m_fighters.ForEach(f => f.Health = f.MaxHealth);
+                m_currentState = MatchState.FIGHT;
+                if (ResetUI != null) {
+                    ResetUI();
+                }
+                m_matchEndStarted = false;
+                m_timeOverFlag = false;
+            }
+            else if (KnockoutEvent != null) {
                 KnockoutEvent(m_fighters);
                 // If we get here it means there is another round to play...
                 m_matchTimer = m_matchTimeLength;
@@ -128,8 +169,15 @@ namespace TDFG {
                 if (ResetUI != null) {
                     ResetUI();
                 }
-                m_koSoundPlaying = false;
+                m_matchEndStarted = false;
+                m_timeOverFlag = false;
             }
+        }
+
+        private IEnumerator PlayClip(AudioClip clip) {
+            m_audioSource.clip = clip;
+            m_audioSource.Play();
+            yield return new WaitUntil(() => m_audioSource.isPlaying == false);
         }
 
         private void UpdateMatchTimer() {
