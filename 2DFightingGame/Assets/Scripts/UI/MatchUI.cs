@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TDFG
 {
@@ -8,33 +9,27 @@ namespace TDFG
     {
 
         [SerializeField]
-        private TMP_Text m_roundStateText;
+        private Text m_roundStateText;
 
         [SerializeField]
-        private List<TMP_Text> m_playerHealthList;
+        private List<PlayerMatchUI> m_playerMatchUI;
 
         [SerializeField]
-        private List<TMP_Text> m_playerRoundsWonList;
-
-        [SerializeField]
-        private TMP_Text m_matchTimer;
+        private Text m_matchTimer;
 
         public string SetRoundStateText(string text) => m_roundStateText.text = text;
 
-        public void UpdateHealth(int index, int health) {
-            if(index >= 0 && index < m_playerHealthList.Count) {
-                m_playerHealthList[index].text = health.ToString();
-            }
+        public void UpdateHealth(Fighter fighter) {
+            float healthPercent = fighter.Health / (float)fighter.MaxHealth;
+            m_playerMatchUI[fighter.PlayerNumber].UpdateHealth(healthPercent);
         }
-        
+
         public void UpdateMatchTimer(float time) {
             m_matchTimer.text = time.ToString("F0");
         }
 
-        public void UpdateRoundsWon(int index, int roundsWon) {
-            if(index >= 0 && index < m_playerRoundsWonList.Count) {
-                m_playerRoundsWonList[index].text = roundsWon.ToString();
-            }
+        public void UpdateRoundsWon(Fighter fighter, string text) {
+            m_playerMatchUI[fighter.PlayerNumber].UpdateRoundWonText(fighter.RoundsWon - 1, text);
         }
     }
 }

@@ -8,12 +8,16 @@ using Random = UnityEngine.Random;
 namespace TDFG {
     [RequireComponent(typeof(AudioManager))]
     [RequireComponent(typeof(MatchEvent))]
+    [RequireComponent (typeof(MatchUIEvents))]
     [RequireComponent(typeof(AudioSource))]
     public class MatchManager : MonoBehaviour
     {
-        public static event Action<Fighter> InitializeUI;
+        // Match events
         public static event Action<List<Fighter>, int> TimeOverEvent;
         public static event Action<List<Fighter>, int> KnockoutEvent;
+
+        // Match UI events
+        public static event Action<Fighter> InitializeUI;
         public static event Action ResetUI;
         public static event Action<float> UpdateMatchTimer;
 
@@ -22,9 +26,6 @@ namespace TDFG {
 
         [SerializeField]
         private List<PlayerController> m_players;
-
-        [SerializeField]
-        private TMP_Text m_matchTimeText;
 
         [SerializeField]
         private float m_matchTimeLength;

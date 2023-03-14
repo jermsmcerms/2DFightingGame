@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 namespace TDFG {
     public class Fighter : MonoBehaviour
     {
-        public static event Action<int, int> UpdateHealthEvent;
+        public static event Action<Fighter> UpdateHealthEvent;
         
         public int PlayerNumber { get; set; }
 
@@ -29,7 +29,7 @@ namespace TDFG {
                 int value2 = Random.Range(0, 2);
                 m_health -= value2;
                 if (UpdateHealthEvent != null) {
-                    UpdateHealthEvent(PlayerNumber, Health);
+                    UpdateHealthEvent(this);
                 }
             }
         }
