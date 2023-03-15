@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 7
   fighterName: Zangeif
+  health: 0
+  boxData: {fileID: 11400000, guid: 4c21b6c9592c3304d927523a07b20c66, type: 2}

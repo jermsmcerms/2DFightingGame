@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace TDFG {
     [RequireComponent(typeof(AudioManager))]
@@ -34,8 +32,9 @@ namespace TDFG {
 
         // Private components
         private AudioManager m_audioManager;
-
         private AMatchState m_matchState;
+
+        private List<FighterData> m_fighterData;
 
         public void EndMatch() {
             if (!m_matchEndStarted) {
@@ -64,7 +63,17 @@ namespace TDFG {
 
             m_matchState = new MatchStartState();
 
-            PlayerConfigurationManager.Instance.PlayerConfigurations.ForEach(pi => Debug.Log(pi.FighterData.fighterName));
+            m_fighterData = new();
+
+            PlayerConfigurationManager.Instance.PlayerConfigurations.ForEach(pi => { 
+                Debug.Log(pi.FighterData.fighterName);
+                pi.FighterData.InitBox();
+                m_fighterData.Add(pi.FighterData);
+            });
+        }
+
+        private void OnDrawGizmos() {
+            m_fighterData?.ForEach(f => f.Box.DrawBox());
         }
 
         void Update() {

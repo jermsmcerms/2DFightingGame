@@ -28,9 +28,6 @@ namespace TDFG {
         private AudioClip m_submitClip;
 
         private AudioSource m_audioSource;
-        private float m_time;
-        private float m_ignoreInputTime = 1.0f;
-        private bool m_inputEnabled;
 
         public void OnSelect() {
             m_audioSource.clip = m_selectClip;
@@ -38,22 +35,11 @@ namespace TDFG {
         }
 
         public void OnSubmit(int characterIndex) {
-            if(m_inputEnabled) {
-                StartCoroutine(HandleSubmitEvent(characterIndex));
-            }
-            else {
-                m_time = Time.time;
-            }
+            StartCoroutine(HandleSubmitEvent(characterIndex));
         }
 
         private void Awake() {
             m_audioSource = GetComponent<AudioSource>();
-        }
-
-        private void Update() {
-            if(Time.time - m_time > m_ignoreInputTime) {
-                m_inputEnabled = true;
-            }
         }
 
         private IEnumerator HandleSubmitEvent(int characterIndex) {

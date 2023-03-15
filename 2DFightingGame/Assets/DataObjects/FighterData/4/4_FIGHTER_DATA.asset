@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 4
   fighterName: Blanka
+  health: 0
+  boxData: {fileID: 11400000, guid: 717ee66bbb1d0674085966ca6ec71b71, type: 2}

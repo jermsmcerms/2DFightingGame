@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 3
   fighterName: E. Honda
+  health: 0
+  boxData: {fileID: 11400000, guid: 4557f895b66a6e842bcd7b58494c3e55, type: 2}

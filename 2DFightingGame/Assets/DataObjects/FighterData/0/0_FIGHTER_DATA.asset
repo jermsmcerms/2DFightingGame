@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 3
   fighterName: Ryu
+  health: 0
+  boxData: {fileID: 11400000, guid: 69598d83d84f57b48b247733d2f9d8a0, type: 2}
