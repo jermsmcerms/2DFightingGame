@@ -3,6 +3,8 @@ namespace TDFG {
         QUIT = -1,
         MAIN,
         MATCH,
-        REMATCH
+        REMATCH,
+        SINGLE_PLAYER_CS,
+        MULTI_PLAYER_CS
     }
 }

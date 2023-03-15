@@ -190,7 +190,19 @@ namespace TDFG
             ]
         }
     ],
-    ""controlSchemes"": []
+    ""controlSchemes"": [
+        {
+            ""name"": ""Keyboard"",
+            ""bindingGroup"": ""Keyboard"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        }
+    ]
 }");
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -328,6 +340,15 @@ namespace TDFG
             }
         }
         public MatchControlsActions @MatchControls => new MatchControlsActions(this);
+        private int m_KeyboardSchemeIndex = -1;
+        public InputControlScheme KeyboardScheme
+        {
+            get
+            {
+                if (m_KeyboardSchemeIndex == -1) m_KeyboardSchemeIndex = asset.FindControlSchemeIndex("Keyboard");
+                return asset.controlSchemes[m_KeyboardSchemeIndex];
+            }
+        }
         public interface IUIActions
         {
             void OnNavigation(InputAction.CallbackContext context);
