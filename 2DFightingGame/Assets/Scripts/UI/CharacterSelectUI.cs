@@ -18,8 +18,9 @@ namespace TDFG {
         [SerializeField]
         private GridLayoutGroup m_characterSelectGrid;
 
+        public FighterDataContainer FighterData { get { return m_fighterData; } }
         [SerializeField]
-        private List<FighterData> m_fighterData;
+        private FighterDataContainer m_fighterData;
 
         [SerializeField]
         private AudioClip m_selectClip;
@@ -47,7 +48,7 @@ namespace TDFG {
             m_audioSource.Play();
             yield return new WaitUntil(() => m_audioSource.isPlaying == false);
 
-            PlayerConfigurationManager.Instance.SetFighterData(m_playerIndex, m_fighterData[characterIndex]);
+            PlayerConfigurationManager.Instance.SetFighterData(m_playerIndex, m_fighterData.fighters[characterIndex]);
             PlayerConfigurationManager.Instance.ReadyPlayer(m_playerIndex);
         }
     }

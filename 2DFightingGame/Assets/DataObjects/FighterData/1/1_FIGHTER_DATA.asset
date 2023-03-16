@@ -15,4 +15,5 @@ MonoBehaviour:
   fighterId: 0
   fighterName: Ken
   health: 0
+  maxHealth: 1025
   boxData: {fileID: 11400000, guid: 87cb22f71a9aac841932668fbbdfaaae, type: 2}

@@ -7,12 +7,12 @@ namespace TDFG
 {
     public class MatchUI : MonoBehaviour
     {
-
-        [SerializeField]
-        private Text m_roundStateText;
-
+        public List<PlayerMatchUI> PlayerUiList { get { return m_playerMatchUI; } }
         [SerializeField]
         private List<PlayerMatchUI> m_playerMatchUI;
+        
+        [SerializeField]
+        private Text m_roundStateText;
 
         [SerializeField]
         private Text m_matchTimer;

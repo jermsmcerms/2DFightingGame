@@ -35,6 +35,14 @@ namespace TDFG {
             m_playerConfigs[playerIndex].IsReady = true;
             if(m_playerConfigs.Count == m_inputManager.maxPlayerCount &&
                 m_playerConfigs.All(p => p.IsReady == true)) {
+                if(m_playerConfigs.Count == 1) {
+                    int randomIndex = Random.Range(0, m_characterSelectUI.FighterData.fighters.Count);
+                    PlayerConfiguration AIPlayer = new (null) {
+                        PlayerIndex = playerIndex + 1,
+                        FighterData = m_characterSelectUI.FighterData.fighters[randomIndex]
+                    };
+                    m_playerConfigs.Add(AIPlayer);
+                }
                 Debug.Log("Fire event to end this scene and then load the next scene when finished");
                 SceneManager.LoadScene((int)SceneIndex.MATCH);
             }
@@ -56,12 +64,12 @@ namespace TDFG {
 
     public class PlayerConfiguration {
         public PlayerInput Input { get; private set; }
-        public int PlayerIndex { get; private set; }
+        public int PlayerIndex { get; set; }
         public bool IsReady { get; set; }
         public FighterData FighterData { get; set; }
 
         public PlayerConfiguration(PlayerInput pi) {
-            PlayerIndex = pi.playerIndex;
+            PlayerIndex = pi != null ? pi.playerIndex : -1;
             Input = pi;
         }
     }

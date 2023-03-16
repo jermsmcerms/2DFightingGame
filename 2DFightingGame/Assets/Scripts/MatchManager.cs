@@ -12,11 +12,13 @@ namespace TDFG {
         // Match events
 
         // Match UI events
+        public static event Action<int, FighterData> InitializePlayerUI;
         public static event Action ResetUI;
         public static event Action<float> UpdateMatchTimer;
 
         public static readonly int ROUNDS_TO_WIN = 2;
         public static readonly int MAX_ROUNDS = 3;
+        public static readonly int NUM_FIGHTERS = 8;
 
         [SerializeField]
         private float m_matchTimeLength;
@@ -34,7 +36,7 @@ namespace TDFG {
         private AudioManager m_audioManager;
         private AMatchState m_matchState;
 
-        private List<FighterData> m_fighterData;
+        private List<Fighter> m_fighters;
 
         public void EndMatch() {
             if (!m_matchEndStarted) {
@@ -63,17 +65,14 @@ namespace TDFG {
 
             m_matchState = new MatchStartState();
 
-            m_fighterData = new();
+            m_fighters = new();
 
             PlayerConfigurationManager.Instance.PlayerConfigurations.ForEach(pi => { 
                 Debug.Log(pi.FighterData.fighterName);
-                pi.FighterData.InitBox();
-                m_fighterData.Add(pi.FighterData);
+                pi.FighterData.InitData();
+                m_fighters.Add(new Fighter(pi.FighterData));
+                InitializePlayerUI?.Invoke(pi.PlayerIndex, pi.FighterData);
             });
-        }
-
-        private void OnDrawGizmos() {
-            m_fighterData?.ForEach(f => f.Box.DrawBox());
         }
 
         void Update() {

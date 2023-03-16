@@ -15,4 +15,5 @@ MonoBehaviour:
   fighterId: 6
   fighterName: Dalsim
   health: 0
+  maxHealth: 950
   boxData: {fileID: 11400000, guid: 81c5d7f54be31494b814e1ed091d9b10, type: 2}

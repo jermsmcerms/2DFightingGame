@@ -9,11 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 131f1214924873f42ada4f281b635e5a, type: 3}
-  m_Name: 7_FIGHTER_DATA
+  m_Script: {fileID: 11500000, guid: 6e23c5f056b695e4baa06e2601997cb6, type: 3}
+  m_Name: IDLE
   m_EditorClassIdentifier: 
-  fighterId: 7
-  fighterName: Zangeif
-  health: 0
-  maxHealth: 1075
-  boxData: {fileID: 11400000, guid: 4c21b6c9592c3304d927523a07b20c66, type: 2}
+  actionId: 0

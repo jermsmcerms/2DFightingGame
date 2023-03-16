@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 3
   fighterName: Ryu
-  health: 0
-  boxData: {fileID: 11400000, guid: 69598d83d84f57b48b247733d2f9d8a0, type: 2}
+  maxHealth: 1025
+  forwardWalkSpeed: 0.047
+  backwardWalkSpeed: 0.032
+  actionData: {fileID: 11400000, guid: ee2f4066d3706154dbeae6738ad0835d, type: 2}

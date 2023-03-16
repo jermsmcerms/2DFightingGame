@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighterId: 2
   fighterName: Chun-Li
-  health: 0
+  health: 975
+  maxHealth: 975
   boxData: {fileID: 11400000, guid: bb56af0f259b9724bbac412145b1e928, type: 2}

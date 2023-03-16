@@ -15,4 +15,5 @@ MonoBehaviour:
   fighterId: 5
   fighterName: Guile
   health: 0
+  maxHealth: 975
   boxData: {fileID: 11400000, guid: 62521c8af77928d4ea369be65b42afe4, type: 2}
